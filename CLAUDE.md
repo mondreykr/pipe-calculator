@@ -19,12 +19,14 @@ Durable project knowledge lives in `.scaffold/`. Orient with `/scaffold-status` 
   - Loads with defaults applied (NPS 8, 660 psig, 500 °F, A333 Gr 6, 1/4" CA, E = 1.00, 12.5% mill tolerance) and results already computed.
 
 - **Deploy — check**
-  - `gh api repos/:owner/:repo/pages` reports the configured source branch and path. Reports; changes nothing.
+  - `gh api repos/:owner/:repo/pages` reports the source branch, path and build status. Reports; changes nothing.
+  - Live at https://mondreykr.github.io/pipe-calculator/
 
 - **Deploy — publish**
-  - GitHub Pages, serving the `main` branch from the root folder — the same pattern as `enercorp/bom-tool`. Pushing to `main` *is* the deploy; there is no pipeline and no build.
-  - **Adam's call. Never unasked, and never automated.** Gated behind the release-readiness milestone. Downstream are engineers specifying pipe from screenshotted results — a wrong allowable stress value ships as a wrong wall thickness, and no one downstream is positioned to catch it.
-  - **A Pages site is reachable by anyone with the URL, even when the repository is private** (verified against `bom-tool`: private repo, anonymous fetch returns HTTP 200). Publishing ASME Table A-1 values there is a copyright exposure, not an internal-only act. Do not enable Pages until that is settled — see `.scaffold/state.md` Open Questions.
+  - **`git push origin main` is the deploy.** GitHub Pages serves `main` from the root folder with no build. There is no separate publish command, which means every push to `main` is visible to anyone with the URL within a minute.
+  - **Adam's call on what reaches `main`. Never push unasked.** Downstream are engineers specifying pipe from screenshotted results — a wrong allowable stress value ships as a wrong wall thickness, and no one downstream is positioned to catch it.
+  - The current URL is Adam's own preview, on his personal account. The destination is the `enercorp` org alongside `bom-tool`, at which point other people get access. Until that move, do not treat the deployed page as something anyone else is reading.
+  - The ASME copyright question on publishing ~15 extracted stress values is **settled and accepted**. Do not re-raise it.
 
 ## Tests
 

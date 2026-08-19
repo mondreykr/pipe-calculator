@@ -40,11 +40,15 @@ Two reference tables live as exported constants in `js/data/`, one file each, de
 **`CAS` / `JOINTS` / `TOLS`** (in `js/main.js`) — corrosion allowance options (0 through 1/4"), joint efficiency (1.00 / 0.90 / 0.80, matching the line-list rule that derives E from radiography coverage), and mill tolerance (12.5% default, 10% for API 5L, plus custom entry).
 
 ## Deployment
-Not deployed. The target is GitHub Pages serving the `main` branch from the root folder — the same configuration as `enercorp/bom-tool`, which GitHub reports as build type "legacy", meaning the committed files are served as-is with no build. Pushing to `main` is the deploy.
+GitHub Pages, serving the `main` branch from the root folder. GitHub reports build type "legacy", meaning the committed files are served as-is with no build. **Pushing to `main` is the deploy** — there is no pipeline and no build step.
 
-Git remote: `https://github.com/mondreykr/pipe-calculator.git` (private, personal account). `bom-tool` sits under the `enercorp` org instead; transferring this repository there is an open question.
+Live at **https://mondreykr.github.io/pipe-calculator/** since 2026-08-18.
 
-**A Pages site is publicly reachable even when its repository is private.** Verified 2026-08-18: `enercorp/bom-tool` is a private repository, and an anonymous unauthenticated request to `https://enercorp.github.io/bom-tool/` returns HTTP 200 with the live application. The site is unlisted, not access-controlled. This is decision-relevant here because the release milestone loads ASME Table A-1 values into `js/data/materials.js`.
+**This is a staging home, not the final one.** The repository is currently `mondreykr/pipe-calculator` (public, personal account) and is used this way so Adam can look at the real deployed page instead of a local server. The destination is the `enercorp` org, matching `enercorp/bom-tool`, at which point the URL changes and other people get access. Treat the current URL as Adam's own preview.
+
+A Pages site is reachable by anyone with the URL regardless of repository visibility — verified 2026-08-18 against `enercorp/bom-tool`, a private repository whose Pages site answers an anonymous request with HTTP 200. Publishing the tool's ~15 extracted allowable stress values is settled and accepted: the extract is not a reproduction of Table A-1, EnerCorp holds a licence, and the risk was judged negligible. Do not re-raise it.
+
+Local development does not require the deployed site — see Run / env.
 
 ## Conventions
 

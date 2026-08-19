@@ -4,7 +4,7 @@ An internal EnerCorp web tool that answers one question: for a given pipe size a
 
 It computes the minimum wall thickness required under ASME B31.3 para. 304.1.2, then lists the EnerCorp permitted schedules for that size and highlights the lightest one that satisfies the requirement.
 
-**Not deployed yet.** See Status below.
+**Preview:** https://mondreykr.github.io/pipe-calculator/ — a staging deployment on a personal account, not yet handed to anyone. See Status below.
 
 ## What it does
 
@@ -40,6 +40,8 @@ The two files under `js/data/` are reference data with no logic in them, so valu
 
 ## Running it locally
 
+You don't have to — the preview URL above serves the current `main`. To run it yourself:
+
 ES6 modules require HTTP — opening `index.html` from disk will not work.
 
 ```
@@ -64,7 +66,7 @@ Node only, no dependencies to install. Covers the six hand-verified cases from l
 
 The allowable stress table in `js/data/materials.js` is provisional: exactly one value is confirmed (A333 Gr 6 at 500 °F = 19,000 psi, matching line list 268782), and roughly fifteen others are placeholders pending verification against a licensed copy of ASME B31.3 2024 Table A-1.
 
-Release also needs the material list confirmed and recorded engineering sign-off. See `.scaffold/milestones/01-release-readiness/milestone.md`.
+Release also needs the material list confirmed, recorded engineering sign-off, and the repository moved to the `enercorp` org. See `.scaffold/milestones/01-release-readiness/milestone.md`.
 
 ## Project documentation
 

@@ -14,7 +14,7 @@ Turn a working prototype with correct math and unverified numbers into a tool an
 - [x] 02-regression-harness — split the reference tables out of the calculation logic, then build the dependency-free regression suite from the line list 268782 fixture plus the sort traps, stop conditions and temperature guard — 2026-08-18
 - [ ] 03-second-line-list — run a second line list at a different pressure and temperature, to exercise the stress interpolation the first verification never touched
 - [ ] 04-release-hardening — self-host the Inter webfont or set a clean fallback stack, and settle the display and stamping open questions
-- [ ] 05-signoff-and-deploy — record engineering sign-off with a name and a date, then deploy to internal hosting and distribute the URL
+- [ ] 05-signoff-and-handover — record engineering sign-off with a name and a date, transfer the repository to the `enercorp` org, and distribute the resulting URL
 
 ## Done-contract
 - Every value in `MATS` traces to a licensed Table A-1 citation, and the material list is confirmed against what EnerCorp actually specifies.
@@ -22,5 +22,4 @@ Turn a working prototype with correct math and unverified numbers into a tool an
 - A second line list at different conditions matches, exercising the stress interpolation.
 - The tool renders correctly with Google Fonts unreachable.
 - Engineering sign-off is recorded in the repository with a name and a date.
-- A recorded decision exists on publishing ASME-derived values to a GitHub Pages URL, which is reachable by anyone who has it even though the repository is private.
-- The tool is reachable at a URL that engineers have been given.
+- The repository has moved to the `enercorp` org and the tool is reachable at a URL that engineers have been given.
