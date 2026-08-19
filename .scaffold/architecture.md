@@ -48,6 +48,8 @@ Live at **https://mondreykr.github.io/pipe-calculator/** since 2026-08-18.
 
 A Pages site is reachable by anyone with the URL regardless of repository visibility — verified 2026-08-18 against `enercorp/bom-tool`, a private repository whose Pages site answers an anonymous request with HTTP 200. Publishing the tool's ~15 extracted allowable stress values is settled and accepted: the extract is not a reproduction of Table A-1, EnerCorp holds a licence, and the risk was judged negligible. Do not re-raise it.
 
+**The repository is public and that is deliberate.** Adam reviewed what `.scaffold/` exposes — the line list 268782 identifiers and line tags, and the noted error in the EnerCorp schedule matrix — and ruled none of it sensitive (2026-08-18). Settled. Do not re-raise repository visibility or the content of the knowledge files.
+
 Local development does not require the deployed site — see Run / env.
 
 ## Conventions
