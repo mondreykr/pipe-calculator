@@ -11,7 +11,7 @@ Turn a working prototype with correct math and unverified numbers into a tool an
 
 ## Phases
 - [ ] 01-verify-reference-data — check every allowable stress value against a licensed B31.3 2024 Table A-1, confirm the material list, spot-check the pipe wall table against a controlled chart
-- [ ] 02-regression-harness — split the reference tables out of the calculation logic, then build the dependency-free regression suite from the line list 268782 fixture plus the sort traps, stop conditions and temperature guard
+- [x] 02-regression-harness — split the reference tables out of the calculation logic, then build the dependency-free regression suite from the line list 268782 fixture plus the sort traps, stop conditions and temperature guard — 2026-08-18
 - [ ] 03-second-line-list — run a second line list at a different pressure and temperature, to exercise the stress interpolation the first verification never touched
 - [ ] 04-release-hardening — self-host the Inter webfont or set a clean fallback stack, and settle the display and stamping open questions
 - [ ] 05-signoff-and-deploy — record engineering sign-off with a name and a date, then deploy to internal hosting and distribute the URL
@@ -22,4 +22,5 @@ Turn a working prototype with correct math and unverified numbers into a tool an
 - A second line list at different conditions matches, exercising the stress interpolation.
 - The tool renders correctly with Google Fonts unreachable.
 - Engineering sign-off is recorded in the repository with a name and a date.
-- The tool is reachable at an internal URL that engineers have been given.
+- A recorded decision exists on publishing ASME-derived values to a GitHub Pages URL, which is reachable by anyone who has it even though the repository is private.
+- The tool is reachable at a URL that engineers have been given.

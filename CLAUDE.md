@@ -10,33 +10,35 @@ Durable project knowledge lives in `.scaffold/`. Orient with `/scaffold-status` 
 ## Build, Run, Deploy
 
 - **Build**
-  - None, deliberately. No build step, no package manager, no bundler, no `node_modules` — one self-contained HTML file with inline `<style>` and inline `<script>`. There is no typecheck and no lint, and adding either is a decision, not a tidy-up.
-  - Only external dependency is the Inter webfont from Google Fonts.
+  - None, deliberately. Vanilla JavaScript, ES6 modules, no bundler, no framework, no runtime dependencies. `package.json` exists only to declare `"type": "module"` and the test script — nothing is compiled, and `npm install` installs nothing. There is no typecheck and no lint, and adding either is a decision, not a tidy-up.
+  - Only external asset is the Inter webfont from Google Fonts.
 
 - **Run**
-  - `start plain-calculator-v9.html`
-  - Opens in the default browser. Pure client-side, no server. Loads with defaults applied (NPS 8, 660 psig, 500 °F, A333 Gr 6, 1/4" CA, E = 1.00, 12.5% mill tolerance) and results already computed.
+  - `python -m http.server 8000`, then open `http://localhost:8000/`.
+  - **Opening `index.html` from disk does not work.** ES6 modules are blocked over `file://`, so a double-click gives a blank page with a console error, not a visible failure. Always serve it.
+  - Loads with defaults applied (NPS 8, 660 psig, 500 °F, A333 Gr 6, 1/4" CA, E = 1.00, 12.5% mill tolerance) and results already computed.
 
 - **Deploy — check**
-  - No deploy pipeline exists.
+  - `gh api repos/:owner/:repo/pages` reports the configured source branch and path. Reports; changes nothing.
 
 - **Deploy — publish**
-  - Not built. The target is internal hosting with a distributed URL.
+  - GitHub Pages, serving the `main` branch from the root folder — the same pattern as `enercorp/bom-tool`. Pushing to `main` *is* the deploy; there is no pipeline and no build.
   - **Adam's call. Never unasked, and never automated.** Gated behind the release-readiness milestone. Downstream are engineers specifying pipe from screenshotted results — a wrong allowable stress value ships as a wrong wall thickness, and no one downstream is positioned to catch it.
+  - **A Pages site is reachable by anyone with the URL, even when the repository is private** (verified against `bom-tool`: private repo, anonymous fetch returns HTTP 200). Publishing ASME Table A-1 values there is a copyright exposure, not an internal-only act. Do not enable Pages until that is settled — see `.scaffold/state.md` Open Questions.
 
 ## Tests
 
-**There is no test suite yet.** Building it is phase 02 of the active milestone. Until it exists, the entries below describe what to build and the rules that will govern it.
-
-- **The regression suite** — AUTOMATIC once it exists, before commit
-  - Command: to be established in phase 02. Keep it dependency-free — a plain HTML/JS assert page or a single Node script. Do not introduce a test framework and a package manager into a zero-dependency repo without asking.
-  - **An edit is not finished until the page loads clean and this passes.**
+- **`npm test`** — AUTOMATIC, before commit
+  - `npm test`, or `node test/run-tests.js`. Node only, no dependencies to install, no framework. 17 checks.
+  - **An edit is not finished until this passes and the page still loads clean in a browser.** The suite exercises `js/calc.js` and the data files; it never touches `js/main.js`, so a broken form is invisible to it — serve the page and look.
   - Green means the arithmetic and the selection logic still behave. Green does **not** mean the answers are right — a passing suite over provisional stress values still produces wrong walls.
-  - Never make a red run green by editing the expected values. The fixture is verified against a real line list; the code is what moves.
+  - **Never make a red run green by editing an expected value.** The line list cases were verified by hand against a real line list; the code is what moves.
+  - Do not add a test framework or a runtime dependency to make it nicer. It is deliberately plain.
 
-- **The line list 268782 fixture** — the seed cases inside the above
-  - Six hand-verified cases in `.scaffold/knowledge/line-list-268782-verification.md`, plus the required additions: both sort traps, both stop conditions, the temperature guard.
-  - Every case sits at 660 psig / 500 °F, which lands on a tabulated stress point — so the fixture never exercises the stress interpolation. Do not read a green fixture as coverage of `MATS`.
+- **The line list 268782 fixture** — the six seed cases inside the above
+  - Verified by hand against a real line list; the record is `.scaffold/knowledge/line-list-268782-verification.md`.
+  - The cases pass `S` in directly rather than reading `MATS`, so a placeholder stress value can never make the suite look like verification. Keep it that way.
+  - Every case sits at 660 psig / 500 °F, which lands on a tabulated stress point — so the fixture never exercises the stress interpolation. Do not read a green run as coverage of `MATS`.
 
 - **The outside-truth check** — GATED, offer whenever `MATS` or `PIPE` is touched
   - Compare changed values against a licensed ASME B31.3 2024 Table A-1 (stress) or a controlled pipe chart / ASME B36.10M (walls) — evidence this repo did not author. This is the only kind of check that can catch a wrong number; the regression suite only confirms what the file already claims about itself. Every unexplained difference gets an explanation. "Close enough" is not an outcome.
@@ -62,7 +64,9 @@ Durable project knowledge lives in `.scaffold/`. Orient with `/scaffold-status` 
 - **Keep it selection, not verification.** This tool picks a schedule from a requirement; the line list does the reverse. Do not add a "does this wall pass?" mode.
 - **Add no interpretation layer.** Prose verdicts, colour-coded margin, and pipe-capacity-versus-flange-rating comparison were built and rejected. Do not reintroduce them as a helpful touch.
 - **Give every reference value its source in a comment.** Confirmed and provisional are different states and must be visibly different in the file.
-- **Keep the file dependency-free.** No framework, no build step, no package manager — unless Adam asks for one.
+- **Keep `js/data/` free of logic.** Those two files exist so an engineer can verify numbers without reading code. Exported constants and comments only — no functions, no conditionals.
+- **Keep `js/calc.js` free of the DOM.** It is the tested surface; anything that touches `document` belongs in `js/main.js`.
+- **Add no runtime dependencies and no build step.** No framework, no bundler, no npm packages that ship to the browser — unless Adam asks for one.
 
 ## Hard Constraints
 
