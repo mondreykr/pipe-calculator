@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pipe Wall Calculator — EnerCorp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#617462; --tan:#bfa98e; --ink:#3d3d3d; --no:#8c4a3f;
+  --f:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font-family:var(--f);font-weight:400;
+  font-size:14px;line-height:1.5;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+
+header{background:var(--green);color:#fff;padding:14px 22px;border-bottom:3px solid var(--tan)}
+header h1{font-weight:600;font-size:16px;margin:0;letter-spacing:-.01em}
+header p{margin:2px 0 0;font-size:12px;opacity:.85;font-weight:300}
+
+.page{max-width:790px;margin:0 auto;padding:26px 22px}
+.cols{display:grid;grid-template-columns:275px 1fr;gap:38px;align-items:start}
+
+h2{font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--green);margin:0 0 14px;padding-bottom:6px;border-bottom:1px solid var(--tan)}
+
+.f{margin-bottom:13px}
+.f label{display:block;font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+  color:#7d7d78;margin-bottom:4px;font-weight:500}
+.f select,.f input{width:100%;font-family:var(--f);font-size:14.5px;color:var(--ink);
+  padding:8px 9px;border:1px solid #cfcbc2;background:#fff;border-radius:3px}
+.f select:focus,.f input:focus{outline:2px solid var(--green);outline-offset:1px;border-color:var(--green)}
+.f .hint{font-size:11px;color:#9a9994;margin-top:4px;font-weight:300;line-height:1.45}
+.f .hint.stop{color:var(--no)}
+#customWrap{margin-top:9px}
+#customWrap[hidden]{display:none}
+
+.minwall{display:flex;justify-content:space-between;gap:14px;
+  padding-bottom:13px;border-bottom:1px solid var(--tan);font-size:13.5px}
+.minwall .k{color:#6f6f6a;font-weight:400}
+.minwall .v{font-weight:500}
+.minwall .v.stop{color:var(--no)}
+
+table.sch{--pad:11px;width:calc(100% + (var(--pad) * 2));
+  margin:34px calc(var(--pad) * -1) 0;border-collapse:collapse;font-size:13.5px}
+table.sch th{text-align:left;font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  color:#96958f;font-weight:600;padding:0 var(--pad) 7px;border-bottom:1px solid #e3ded4}
+table.sch th:last-child{text-align:right}
+table.sch td{padding:8px var(--pad);border-bottom:1px solid #f2efe9}
+table.sch td:last-child{text-align:right;font-weight:500}
+table.sch tr.short td{color:#b9b7b1}
+table.sch tr.win td{background:rgba(97,116,98,.11)}
+table.sch tr.win td:first-child{box-shadow:inset 3px 0 0 var(--green)}
+
+.note{font-size:11.5px;color:#8a8a86;margin-top:14px;line-height:1.6;font-weight:300}
+.note.stop{color:var(--no)}
+
+footer{border-top:2px solid var(--tan);max-width:790px;margin:34px auto 0;padding:16px 22px 34px}
+footer dl{display:grid;grid-template-columns:88px 1fr;gap:7px 16px;margin:0;
+  font-size:11.5px;line-height:1.6;color:#8a8a86;font-weight:300}
+footer dt{font-weight:600;color:#6f6f6a;letter-spacing:.05em;text-transform:uppercase;font-size:10px;
+  padding-top:2px}
+footer dd{margin:0}
+footer .eq{font-variant-numeric:tabular-nums;color:#6f6f6a}
+
+@media(max-width:640px){
+  .cols{grid-template-columns:1fr;gap:26px}
+  .page{padding:20px 16px}
+  footer dl{grid-template-columns:1fr;gap:2px 0}
+  footer dd{margin:0 0 9px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Pipe Wall Calculator</h1>
+  <p>ASME B31.3 &mdash; EnerCorp Internal Use</p>
+</header>
+
+<div class="page">
+  <div class="cols">
+
+    <div>
+      <h2>Inputs</h2>
+      <div class="f"><label for="size">Pipe size (NPS)</label><select id="size"></select></div>
+      <div class="f"><label for="press">Design pressure (psig)</label>
+        <input id="press" type="number" value="660" step="10" min="0"></div>
+      <div class="f"><label for="temp">Design temperature (&deg;F)</label>
+        <input id="temp" type="number" value="500" step="25" min="-50"></div>
+      <div class="f"><label for="mat">Material</label><select id="mat"></select>
+        <div class="hint" id="sHint"></div></div>
+      <div class="f"><label for="ca">Corrosion allowance</label><select id="ca"></select></div>
+      <div class="f"><label for="joint">Joint efficiency E/W</label><select id="joint"></select></div>
+      <div class="f"><label for="tol">Mill tolerance</label><select id="tol"></select>
+        <div id="customWrap" hidden>
+          <input id="customTol" type="number" value="12.5" step="0.5" min="0" max="30">
+          <div class="hint">Percent removed from nominal wall.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h2>Result</h2>
+      <div class="minwall">
+        <span class="k">Minimum wall required</span>
+        <span class="v" id="need">&mdash;</span>
+      </div>
+      <table class="sch">
+        <thead><tr><th>Schedule</th><th>Wall</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p class="note" id="note"></p>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <dl>
+    <dt>Basis</dt>
+    <dd><span class="eq">t = PD / 2(SE + PY)</span>, ASME B31.3 para. 304.1.2.
+        Minimum wall = (t + corrosion allowance) &divide; (1 &minus; mill tolerance).</dd>
+
+    <dt>Assumptions</dt>
+    <dd>Y = 0.4, ferritic materials below 900&nbsp;&deg;F. Thread and groove depth taken as zero
+        for welded and flanged construction.</dd>
+
+    <dt>Excludes</dt>
+    <dd>Branch reinforcement, external pressure, thermal expansion and support loading, fatigue,
+        Category M and severe cyclic service. Flange, fitting and MDMT requirements are assessed
+        separately.</dd>
+
+    <dt>Schedules</dt>
+    <dd>EnerCorp permitted set. Sizes 1-1/4, 2-1/2, 3-1/2, 5 and 22 are not used.</dd>
+
+    <dt>Status</dt>
+    <dd>Allowable stress values are provisional pending verification against Table A-1. This tool
+        screens only; the line list remains the calculation of record.</dd>
+  </dl>
+</footer>
+
+<script>
+/* Permitted schedules and B36.10M walls — per EnerCorp schedule matrix. */
+const PIPE={
+ '1/2'  :{od:0.840, sch:{'40':0.109,'80':0.147,'160':0.188,'XXS':0.294}},
+ '3/4'  :{od:1.050, sch:{'40':0.113,'80':0.154,'160':0.219,'XXS':0.308}},
+ '1'    :{od:1.315, sch:{'40':0.133,'80':0.179,'160':0.250,'XXS':0.358}},
+ '1-1/2':{od:1.900, sch:{'40':0.145,'80':0.200,'160':0.281,'XXS':0.400}},
+ '2'    :{od:2.375, sch:{'40':0.154,'80':0.218,'160':0.344,'XXS':0.436}},
+ '3'    :{od:3.500, sch:{'40':0.216,'80':0.300,'160':0.438,'XXS':0.600}},
+ '4'    :{od:4.500, sch:{'40':0.237,'80':0.337,'160':0.531,'XXS':0.674}},
+ '6'    :{od:6.625, sch:{'40':0.280,'80':0.432,'160':0.719,'XXS':0.864}},
+ '8'    :{od:8.625, sch:{'40':0.322,'80':0.500,'XXS':0.875,'160':0.906}},
+ '10'   :{od:10.750,sch:{'40':0.365,'XS':0.500,'80':0.594,'XXS':1.000,'160':1.125}},
+ '12'   :{od:12.750,sch:{'STD':0.375,'40':0.406,'XS':0.500,'80':0.688,'XXS':1.000,'160':1.312}},
+ '14'   :{od:14.000,sch:{'STD':0.375,'40':0.438,'XS':0.500,'80':0.750,'160':1.406}},
+ '16'   :{od:16.000,sch:{'STD':0.375,'XS':0.500,'80':0.844,'160':1.594}},
+ '18'   :{od:18.000,sch:{'STD':0.375,'XS':0.500,'40':0.562,'80':0.938,'160':1.781}},
+ '20'   :{od:20.000,sch:{'STD':0.375,'XS':0.500,'40':0.594,'80':1.031,'160':1.969}},
+ '24'   :{od:24.000,sch:{'STD':0.375,'XS':0.500,'40':0.688,'80':1.219,'160':2.344}}
+};
+
+/* PROVISIONAL — verify every value against B31.3 2024 Table A-1.
+   Only A333 Gr 6 @ 500°F is confirmed (line list 268782). */
+const MATS={
+ 'A333 Gr 6':  {max:650, s:[[100,20000],[400,20000],[500,19000],[600,17300],[650,17000]]},
+ 'A106 Gr B':  {max:800, s:[[100,20000],[400,20000],[650,20000],[700,18900],[750,17300],[800,14200]]},
+ 'A312 TP316': {max:650, s:[[100,20000],[200,19300],[300,17900],[400,17000],[500,16300],[650,15500]]}
+};
+const CAS=[
+ {v:0,      l:'0"'},
+ {v:0.0625, l:'1/16" (1.6 mm)'},
+ {v:0.1250, l:'1/8" (3.2 mm)'},
+ {v:0.1875, l:'3/16" (4.8 mm)'},
+ {v:0.2500, l:'1/4" (6.4 mm)'}
+];
+const JOINTS=[
+ {v:1.00, l:'1.00 — 100% radiography'},
+ {v:0.90, l:'0.90 — spot radiography (>5%)'},
+ {v:0.80, l:'0.80 — no radiography (≤5%)'}
+];
+const TOLS=[
+ {v:'0.125',  l:'Default (12.5%)'},
+ {v:'0.100',  l:'API 5L (10%)'},
+ {v:'custom', l:'Custom %'}
+];
+const Y=0.4, Q=0;
+
+const $=i=>document.getElementById(i);
+const interp=(t,x)=>{
+  if(x<=t[0][0])return t[0][1];
+  if(x>=t[t.length-1][0])return t[t.length-1][1];
+  for(let i=1;i<t.length;i++)if(x<=t[i][0]){
+    const[a,av]=t[i-1],[b,bv]=t[i];return av+(bv-av)*(x-a)/(b-a);}
+};
+const millTol=()=> $('tol').value==='custom'
+  ? Math.min(Math.max(+$('customTol').value||0,0),30)/100
+  : +$('tol').value;
+
+function run(){
+  const nps=$('size').value, D=PIPE[nps].od;
+  const P=+$('press').value||0, T=+$('temp').value;
+  const matN=$('mat').value, mat=MATS[matN];
+  const ca=+$('ca').value, E=+$('joint').value, tol=millTol();
+
+  $('customWrap').hidden = $('tol').value!=='custom';
+
+  const over=T>mat.max, S=interp(mat.s,T);
+  $('sHint').className='hint'+(over?' stop':'');
+  $('sHint').textContent = over
+    ? `${matN} is not listed above ${mat.max}\u00B0F. Do not use this result.`
+    : `Allowable stress S = ${Math.round(S).toLocaleString()} psi at ${T}\u00B0F.`;
+
+  const t=(D*P)/(2*((S*E)+(Y*P)));
+  const need=(t+ca+Q)/(1-tol);
+  const tooThick = t>=D/6;
+
+  /* sorted by wall, not by name — XS is lighter than Sch 40 above NPS 16,
+     and XXS is lighter than Sch 160 from NPS 8 up */
+  const list=Object.entries(PIPE[nps].sch).sort((a,b)=>a[1]-b[1]);
+  let pick=null;
+  if(!tooThick) for(const[name,wall] of list) if(wall>=need){pick={name,wall};break;}
+
+  $('need').textContent=need.toFixed(3)+'"';
+  $('need').className='v'+(tooThick||!pick?' stop':'');
+
+  $('rows').innerHTML=list.map(([name,wall])=>{
+    const cls = wall<need ? 'short' : (pick&&name===pick.name ? 'win' : '');
+    return `<tr class="${cls}"><td>Sch ${name}</td><td>${wall.toFixed(3)}"</td></tr>`;
+  }).join('');
+
+  const n=$('note');
+  if(tooThick){
+    n.className='note stop';
+    n.textContent='Required wall reaches D/6, where this formula no longer applies. Send it to engineering.';
+  }else if(!pick){
+    n.className='note stop';
+    n.textContent='No permitted schedule is thick enough. Send it to engineering.';
+  }else{
+    n.className='note';
+    n.textContent='Minimum wall includes the corrosion allowance and the mill tolerance. Highlighted row is the lightest permitted schedule that passes; heavier is always acceptable.';
+  }
+}
+
+$('size').innerHTML=Object.keys(PIPE).map(s=>`<option value="${s}">${s}"</option>`).join('');
+$('size').value='8';
+$('mat').innerHTML=Object.keys(MATS).map(m=>`<option>${m}</option>`).join('');
+$('ca').innerHTML=CAS.map(c=>`<option value="${c.v}">${c.l}</option>`).join('');
+$('ca').value='0.25';
+$('joint').innerHTML=JOINTS.map(j=>`<option value="${j.v}">${j.l}</option>`).join('');
+$('tol').innerHTML=TOLS.map(t=>`<option value="${t.v}">${t.l}</option>`).join('');
+['size','press','temp','mat','ca','joint','tol','customTol'].forEach(i=>$(i).addEventListener('input',run));
+run();
+</script>
+</body>
+</html>
