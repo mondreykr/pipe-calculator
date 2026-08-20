@@ -74,7 +74,9 @@ function run() {
   }
 }
 
-$('size').innerHTML = Object.keys(PIPE).map(s => `<option value="${s}">${s}"</option>`).join('');
+// ponytail: sort by OD — integer-like keys ('2','8') enumerate before '1/2' in JS, so insertion order is not display order
+$('size').innerHTML = Object.keys(PIPE).sort((a, b) => PIPE[a].od - PIPE[b].od)
+  .map(s => `<option value="${s}">${s}"</option>`).join('');
 $('size').value = '8';
 $('mat').innerHTML = Object.keys(MATS).map(m => `<option>${m}</option>`).join('');
 $('ca').innerHTML = CAS.map(c => `<option value="${c.v}">${c.l}</option>`).join('');
