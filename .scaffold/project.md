@@ -29,4 +29,4 @@ Each of the following was considered during specification and rejected. Reversin
 
 **Rejected interaction models:** a single-answer output instead of the ladder (hides the options an engineer needs to see); a verification mode that checks a proposed wall instead of selecting one (that is what the line list does); an interpretation layer stating verdicts in prose, colour-coding margin, or comparing pipe capacity against flange rating (noise, or answering a different question).
 
-The rejected-alternative rationale for twelve numbered decisions lives in `DECISIONS.md`, which is not in this repository — see `state.md` Open Questions.
+The rejected-alternative rationale for twelve numbered decisions lives in `DECISIONS.md`, which is not in this repository - see `state.md` Open Questions.

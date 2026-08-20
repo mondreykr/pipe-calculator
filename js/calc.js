@@ -1,4 +1,4 @@
-/* The engine. Pure functions, no DOM — this file is what test/run-tests.js exercises.
+/* The engine. Pure functions, no DOM - this file is what test/run-tests.js exercises.
  *
  *   t       = P·D / (2·(S·E + Y·P))        pressure design thickness, B31.3 304.1.2
  *   minimum = (t + c + q) / (1 − mill_tol) minimum nominal wall to purchase
@@ -6,12 +6,12 @@
  *
  * Algebraically identical to the line-list method, which computes available wall as
  * (nominal × 0.875) − CA − thread and requires it to exceed t. Equivalence confirmed
- * over six lines — see .scaffold/knowledge/line-list-268782-verification.md
+ * over six lines - see .scaffold/knowledge/line-list-268782-verification.md
  */
 
 /* Valid for ferritic materials below 900 °F. The material temperature ceilings in
    data/materials.js keep every current path inside that range, but nothing here
-   enforces the coupling — check it before adding a material. */
+   enforces the coupling - check it before adding a material. */
 export const Y = 0.4;
 
 /* Thread or groove depth. Zero is correct for welded and flanged construction.
@@ -20,7 +20,7 @@ export const Q = 0;
 
 /* Linear interpolation over [temp, stress] points.
    Above the last point: clamps. The caller must refuse above mat.max before ever
-   getting here — see overTemperature().
+   getting here - see overTemperature().
    Below the first point: clamps. Conservative for carbon steel, but it is an open
    decision given the −50 °F MDMT on this equipment. */
 export function interpolateStress(points, tempF) {
@@ -34,10 +34,25 @@ export function interpolateStress(points, tempF) {
   }
 }
 
-/* Above a material's highest tabulated temperature the tool refuses rather than
-   extrapolating. A refusal is a result; a guessed number is not. */
+/* Temperature limit checks. Both WARN, they do not suppress the schedule selection -
+   Adam's decision 2026-08-20, on the grounds that a note is sufficient for a screening
+   tool. Above `max` interpolateStress clamps, so the answer stops changing with
+   temperature; that is what the warning exists to tell the user. */
 export function overTemperature(material, tempF) {
   return tempF > material.max;
+}
+
+/* Below the minimum temperature Table A-1C lists for the material. Returns false when
+   the table prints a letter code rather than a number, because there is no number to
+   compare against - use noteGovernedMinimum() to detect that case instead. */
+export function underTemperature(material, tempF) {
+  return typeof material.min === 'number' && tempF < material.min;
+}
+
+/* True when the material's minimum temperature is a Table A-1C Note (6) letter code.
+   The tool cannot check the floor for these and must say so rather than imply a pass. */
+export function noteGovernedMinimum(material) {
+  return typeof material.min === 'string';
 }
 
 /* Pressure design thickness. P psig, D inches OD, S psi, E joint efficiency. */
@@ -62,7 +77,7 @@ export function tooThick(t, D) {
  * Not cosmetic, and not safe to replace with name order or object insertion order:
  * from NPS 8 up XXS is thinner than Sch 160, and from NPS 18 up XS is thinner than
  * Sch 40. A name-ordered list selects heavier pipe than required. Covered by
- * test/run-tests.js — the two sort-trap cases exist to catch exactly this.
+ * test/run-tests.js - the two sort-trap cases exist to catch exactly this.
  */
 export function ladder(schedules) {
   return Object.entries(schedules).sort((a, b) => a[1] - b[1]);

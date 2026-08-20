@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pipe Wall Calculator — EnerCorp</title>
+<title>Pipe Wall Calculator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -13,7 +13,7 @@
 
 <header>
   <h1>Pipe Wall Calculator</h1>
-  <p>ASME B31.3 &mdash; EnerCorp Internal Use</p>
+  <p>ASME B31.3</p>
 </header>
 
 <div class="page">
@@ -42,7 +42,7 @@
       <h2>Result</h2>
       <div class="minwall">
         <span class="k">Minimum wall required</span>
-        <span class="v" id="need">&mdash;</span>
+        <span class="v" id="need">-</span>
       </div>
       <table class="sch">
         <thead><tr><th>Schedule</th><th>Wall</th></tr></thead>
@@ -73,11 +73,27 @@
     <dd>EnerCorp permitted set. Sizes 1-1/4, 2-1/2, 3-1/2, 5 and 22 are not used.</dd>
 
     <dt>Status</dt>
-    <dd>Allowable stress values are provisional pending verification against Table A-1. This tool
+    <dd>Allowable stress values are transcribed from ASME B31.3 Table A-1C. Pipe dimensions are
+        checked against an ANSI B36.10 chart and the EnerCorp component criteria workbook. This tool
         screens only; the line list remains the calculation of record.</dd>
   </dl>
 </footer>
 
+<!-- Temporary diagnostic: surfaces a module load or runtime error on the page itself,
+     because a silent failure renders as a styled form with empty dropdowns. Remove once
+     the current issue is understood. -->
+<script>
+window.addEventListener('error', function (e) {
+  var pre = document.createElement('pre');
+  pre.style.cssText = 'color:#b00020;background:#fff3f3;white-space:pre-wrap;'
+    + 'padding:12px;margin:0;font:12px/1.5 monospace;border-bottom:2px solid #b00020';
+  pre.textContent = 'SCRIPT ERROR
+' + (e.message || String(e))
+    + '
+' + (e.filename || '(no file)') + ' line ' + (e.lineno || '?');
+  document.body.insertBefore(pre, document.body.firstChild);
+}, true);
+</script>
 <script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -29,7 +29,7 @@ Five of six selections match exactly.
 
 ## The one difference, and why it is not a defect
 
-Line 10-CLS-G-001: XS at 0.500" clears a 0.4962" requirement by 0.0038", and the engineer went up one schedule. That is a margin judgment the calculation does not contain and is not meant to contain. It is also the clearest argument for showing margin somewhere in the interface — see the open question in `state.md`.
+Line 10-CLS-G-001: XS at 0.500" clears a 0.4962" requirement by 0.0038", and the engineer went up one schedule. That is a margin judgment the calculation does not contain and is not meant to contain. It is also the clearest argument for showing margin somewhere in the interface - see the open question in `state.md`.
 
 ## What this verification does not cover
 
@@ -37,8 +37,8 @@ Every case is 660 psig at 500 °F, which lands exactly on a tabulated stress poi
 
 ## Cases the regression suite must add
 
-- **Sort trap, NPS 18** — XS must place above Sch 40.
-- **Sort trap, NPS 8** — XXS must place above Sch 160.
-- **Stop condition** — `t ≥ D/6` suppresses the selection.
-- **Stop condition** — no permitted schedule thick enough suppresses the selection.
-- **Temperature guard** — above a material's maximum tabulated temperature, refuse rather than extrapolate.
+- **Sort trap, NPS 18** - XS must place above Sch 40.
+- **Sort trap, NPS 8** - XXS must place above Sch 160.
+- **Stop condition** - `t ≥ D/6` suppresses the selection.
+- **Stop condition** - no permitted schedule thick enough suppresses the selection.
+- **Temperature guard** - above a material's maximum tabulated temperature, refuse rather than extrapolate.

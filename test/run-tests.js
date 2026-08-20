@@ -1,12 +1,13 @@
 /* Regression suite. Run: node test/run-tests.js
  *
- * No framework, no dependencies, no fixtures directory — node and assert only.
+ * No framework, no dependencies, no fixtures directory - node and assert only.
  *
  * WHAT GREEN MEANS: the arithmetic and the selection logic still behave.
- * WHAT GREEN DOES NOT MEAN: that the answers are right. The allowable stress table
- * is provisional, so a passing run over wrong stress values still yields wrong walls.
- * These tests pass S in directly rather than reading it from data/materials.js,
- * precisely so a placeholder value can never make this suite look like verification.
+ * WHAT GREEN DOES NOT MEAN: that the answers are right. The pipe dimension table is
+ * still mostly unverified, so a passing run can still yield a wrong wall.
+ * The line list cases pass S in directly rather than reading it from
+ * data/materials.js, so a bad stress value can never make them look like verification.
+ * Only the explicit Table A-1C spot checks below read MATS on purpose.
  *
  * Never make a red run green by editing an expected value. The line list cases below
  * were verified by hand against a real line list; the code is what moves.
@@ -15,7 +16,7 @@ import assert from 'node:assert/strict';
 import { PIPE } from '../js/data/pipe.js';
 import { MATS } from '../js/data/materials.js';
 import {
-  interpolateStress, overTemperature, pressureThickness,
+  interpolateStress, overTemperature, underTemperature, noteGovernedMinimum, pressureThickness,
   minimumWall, ladder, selectSchedule, tooThick
 } from '../js/calc.js';
 
@@ -27,7 +28,7 @@ const check = (name, fn) => {
 const section = s => console.log(`\n${s}`);
 
 /* ------------------------------------------------------------------ *
- * 1. Line list 268782 — the only independent verification this tool has.
+ * 1. Line list 268782 - the only independent verification this tool has.
  *    A333 Gr 6, 660 psig, 500 °F, S = 19,000, E = 1.0, CA = 0.250", 12.5% mill tol.
  *    Source: .scaffold/knowledge/line-list-268782-verification.md
  * ------------------------------------------------------------------ */
@@ -55,10 +56,10 @@ for (const c of LINE_LIST) {
 
 /* Note: every case above sits at 660 psig / 500 °F, which lands exactly on a tabulated
    stress point. This block never exercises the interpolation. A second line list at
-   different conditions is scheduled work — see milestone 01, phase 03. */
+   different conditions is scheduled work - see milestone 01, phase 03. */
 
 /* ------------------------------------------------------------------ *
- * 2. Sort traps — the ladder must be ordered by wall, never by name.
+ * 2. Sort traps - the ladder must be ordered by wall, never by name.
  * ------------------------------------------------------------------ */
 section('Ladder ordering');
 
@@ -82,7 +83,7 @@ check('every size ladders in non-decreasing wall order', () => {
 });
 
 /* ------------------------------------------------------------------ *
- * 3. Stop conditions — both must suppress the selection, never degrade it.
+ * 3. Stop conditions - both must suppress the selection, never degrade it.
  * ------------------------------------------------------------------ */
 section('Stop conditions');
 
@@ -112,11 +113,13 @@ check('no permitted schedule thick enough returns null, not the heaviest', () =>
 section('Temperature guard and interpolation');
 
 check('refuses above a material maximum tabulated temperature', () => {
-  assert.equal(overTemperature(MATS['A333 Gr 6'], 700), true);
+  // 900 F is the Y = 0.4 ceiling every carbon steel entry is capped at, not the
+  // end of Table A-1C. Was 650 while the table was provisional.
+  assert.equal(overTemperature(MATS['A333 Gr 6'], 950), true);
 });
 
 check('accepts at the maximum tabulated temperature', () => {
-  assert.equal(overTemperature(MATS['A333 Gr 6'], 650), false);
+  assert.equal(overTemperature(MATS['A333 Gr 6'], 900), false);
 });
 
 check('A333 Gr 6 at 500 F returns the confirmed 19,000 psi', () => {
@@ -124,8 +127,50 @@ check('A333 Gr 6 at 500 F returns the confirmed 19,000 psi', () => {
 });
 
 check('interpolates linearly between tabulated points', () => {
-  // 500 F -> 19,000 and 600 F -> 17,300, so 550 F -> 18,150
-  assert.equal(interpolateStress(MATS['A333 Gr 6'].s, 550), 18150);
+  // 500 F -> 19,000 and 600 F -> 17,900 per Table A-1C line 34, so 550 F -> 18,450.
+  // Expected 18,150 while 600 F held the provisional 17,300.
+  assert.equal(interpolateStress(MATS['A333 Gr 6'].s, 550), 18450);
+});
+
+check('Table A-1C spot values transcribed correctly', () => {
+  // One point per stress row shape, against the licensed scan.
+  assert.equal(interpolateStress(MATS['A234 WPB'].s, 750), 13900);   // line 129
+  assert.equal(interpolateStress(MATS['A420 WPL6'].s, 900), 5900);   // line 128
+  assert.equal(interpolateStress(MATS['A105'].s, 500), 19600);       // line 144
+  assert.equal(interpolateStress(MATS['A350 LF2 Cl 1'].s, 300), 21200); // line 142
+});
+
+check('warns below a numeric minimum temperature, not above it', () => {
+  // A105 min temp is -20 F per Table A-1C line 144.
+  assert.equal(underTemperature(MATS['A105'], -30), true);
+  assert.equal(underTemperature(MATS['A105'], -20), false);
+  assert.equal(underTemperature(MATS['A105'], 500), false);
+});
+
+check('note-governed minimums are flagged, never guessed', () => {
+  // A106 Gr B and A234 WPB print a letter code, not a number, in Table A-1C.
+  assert.equal(noteGovernedMinimum(MATS['A106 Gr B']), true);
+  assert.equal(underTemperature(MATS['A106 Gr B'], -400), false);
+  assert.equal(noteGovernedMinimum(MATS['A333 Gr 6']), false);
+});
+
+check('every material carries a minimum temperature, number or code', () => {
+  for (const [name, m] of Object.entries(MATS)) {
+    const ok = typeof m.min === 'number' || typeof m.min === 'string';
+    assert.ok(ok, `${name} has no min`);
+  }
+});
+
+check('the default material key exists, so the dropdown default cannot slip', () => {
+  // main.js sets $('mat').value = 'A333 Gr 6'. If that key is renamed the assignment
+  // silently fails and the first option wins, which is a stronger material.
+  assert.ok(MATS['A333 Gr 6'], 'A333 Gr 6 missing from MATS');
+});
+
+check('every material carries a description for the dropdown', () => {
+  for (const [name, m] of Object.entries(MATS)) {
+    assert.ok(m.desc && m.desc.length > 5, `${name} has no desc`);
+  }
 });
 
 check('clamps below the lowest tabulated temperature (documented open question)', () => {

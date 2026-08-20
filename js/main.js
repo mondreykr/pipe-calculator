@@ -2,11 +2,11 @@
 import { PIPE } from './data/pipe.js';
 import { MATS } from './data/materials.js';
 import {
-  interpolateStress, overTemperature, pressureThickness,
-  minimumWall, ladder, selectSchedule, tooThick
+  interpolateStress, overTemperature, underTemperature, noteGovernedMinimum,
+  pressureThickness, minimumWall, ladder, selectSchedule, tooThick
 } from './calc.js';
 
-/* Input options. Not reference data — these are the choices the form offers. */
+/* Input options. Not reference data - these are the choices the form offers. */
 const CAS = [
  {v:0,      l:'0"'},
  {v:0.0625, l:'1/16" (1.6 mm)'},
@@ -16,9 +16,9 @@ const CAS = [
 ];
 /* Matches the line-list rule that derives E from radiography coverage. */
 const JOINTS = [
- {v:1.00, l:'1.00 — 100% radiography'},
- {v:0.90, l:'0.90 — spot radiography (>5%)'},
- {v:0.80, l:'0.80 — no radiography (≤5%)'}
+ {v:1.00, l:'1.00 (100% radiography)'},
+ {v:0.90, l:'0.90 (spot radiography, >5%)'},
+ {v:0.80, l:'0.80 (no radiography, ≤5%)'}
 ];
 const TOLS = [
  {v:'0.125',  l:'Default (12.5%)'},
@@ -40,11 +40,26 @@ function run() {
 
   $('customWrap').hidden = $('tol').value !== 'custom';
 
-  const over = overTemperature(mat, T), S = interpolateStress(mat.s, T);
-  $('sHint').className = 'hint' + (over ? ' stop' : '');
-  $('sHint').textContent = over
-    ? `${matN} is not listed above ${mat.max}°F. Do not use this result.`
-    : `Allowable stress S = ${Math.round(S).toLocaleString()} psi at ${T}°F.`;
+  /* Temperature notes. Both limits warn and leave the ladder rendered - see calc.js. */
+  const over = overTemperature(mat, T), under = underTemperature(mat, T);
+  const S = interpolateStress(mat.s, T);
+  const notes = [];
+  if (over) {
+    notes.push(`${T}°F is above the ${mat.max}°F ceiling this tool applies to ${matN}.`);
+  } else if (under) {
+    notes.push(`${T}°F is below the ${mat.min}°F minimum temperature Table A-1C lists `
+      + `for ${matN}. Do not use this result.`);
+  } else {
+    notes.push(`Allowable stress S = ${Math.round(S).toLocaleString()} psi at ${T}°F.`);
+  }
+  /* Below 100 °F is the bottom band of Table A-1C, where the material's own floor is
+     what decides. For a note-governed floor the tool has no number to check it with. */
+  if (noteGovernedMinimum(mat) && T < 100) {
+    notes.push(`The minimum temperature for ${matN} is set by Table A-1C Note (6), `
+      + `code ${mat.min}, which is not encoded here. Check it before cold service.`);
+  }
+  $('sHint').className = 'hint' + (over || under ? ' stop' : '');
+  $('sHint').textContent = notes.join(' ');
 
   const t = pressureThickness({ P, D, S, E });
   const need = minimumWall({ t, ca, millTol: tol });
@@ -64,21 +79,23 @@ function run() {
   const n = $('note');
   if (stopped) {
     n.className = 'note stop';
-    n.textContent = 'Required wall reaches D/6, where this formula no longer applies. Send it to engineering.';
+    n.textContent = 'Required wall reaches D/6, where this formula no longer applies.';
   } else if (!pick) {
     n.className = 'note stop';
-    n.textContent = 'No permitted schedule is thick enough. Send it to engineering.';
+    n.textContent = 'No permitted schedule is thick enough.';
   } else {
     n.className = 'note';
-    n.textContent = 'Minimum wall includes the corrosion allowance and the mill tolerance. Highlighted row is the lightest permitted schedule that passes; heavier is always acceptable.';
+    n.textContent = 'Minimum wall includes the corrosion allowance and the mill tolerance. Highlighted row is the lightest permitted schedule that passes.';
   }
 }
 
-// ponytail: sort by OD — integer-like keys ('2','8') enumerate before '1/2' in JS, so insertion order is not display order
+// ponytail: sort by OD - integer-like keys ('2','8') enumerate before '1/2' in JS, so insertion order is not display order
 $('size').innerHTML = Object.keys(PIPE).sort((a, b) => PIPE[a].od - PIPE[b].od)
   .map(s => `<option value="${s}">${s}"</option>`).join('');
 $('size').value = '8';
-$('mat').innerHTML = Object.keys(MATS).map(m => `<option>${m}</option>`).join('');
+$('mat').innerHTML = Object.keys(MATS)
+  .map(m => `<option value="${m}">${m} (${MATS[m].desc})</option>`).join('');
+$('mat').value = 'A333 Gr 6';
 $('ca').innerHTML = CAS.map(c => `<option value="${c.v}">${c.l}</option>`).join('');
 $('ca').value = '0.25';
 $('joint').innerHTML = JOINTS.map(j => `<option value="${j.v}">${j.l}</option>`).join('');

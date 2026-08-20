@@ -11,7 +11,7 @@ header h1{font-weight:600;font-size:16px;margin:0;letter-spacing:-.01em}
 header p{margin:2px 0 0;font-size:12px;opacity:.85;font-weight:300}
 
 .page{max-width:790px;margin:0 auto;padding:26px 22px}
-.cols{display:grid;grid-template-columns:275px 1fr;gap:38px;align-items:start}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:38px;align-items:start}
 
 h2{font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
   color:var(--green);margin:0 0 14px;padding-bottom:6px;border-bottom:1px solid var(--tan)}
