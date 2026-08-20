@@ -22,6 +22,7 @@
  * ORDER IS ASCENDING SPEC NUMBER, which is how an engineer scans a material list.
  * Key order here is the dropdown order. It interleaves pipe with fittings and
  * forgings deliberately: the spec number is what the user is looking for.
+ * The output still reads as a pipe schedule and does not know a forging was selected.
  *
  * TEMPERATURE CEILING - why max is 900 and not the table's 1,000/1,100:
  * calc.js uses a fixed Y = 0.4, which B31.3 gives for ferritic materials at 900 °F

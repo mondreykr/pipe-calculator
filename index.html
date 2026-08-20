@@ -38,16 +38,16 @@
       </div>
     </div>
 
-    <div>
+    <div class="panel">
       <h2>Result</h2>
-      <div class="minwall">
-        <span class="k">Minimum wall required</span>
-        <span class="v" id="need">-</span>
+      <div role="table">
+        <div class="shead" role="row">
+          <span role="columnheader">Schedule</span>
+          <span class="anch" role="columnheader"><span class="lab" id="need"></span></span>
+          <span role="columnheader">Wall</span>
+        </div>
+        <div id="rows" role="rowgroup"></div>
       </div>
-      <table class="sch">
-        <thead><tr><th>Schedule</th><th>Wall</th></tr></thead>
-        <tbody id="rows"></tbody>
-      </table>
       <p class="note" id="note"></p>
     </div>
 
@@ -79,21 +79,6 @@
   </dl>
 </footer>
 
-<!-- Temporary diagnostic: surfaces a module load or runtime error on the page itself,
-     because a silent failure renders as a styled form with empty dropdowns. Remove once
-     the current issue is understood. -->
-<script>
-window.addEventListener('error', function (e) {
-  var pre = document.createElement('pre');
-  pre.style.cssText = 'color:#b00020;background:#fff3f3;white-space:pre-wrap;'
-    + 'padding:12px;margin:0;font:12px/1.5 monospace;border-bottom:2px solid #b00020';
-  pre.textContent = 'SCRIPT ERROR
-' + (e.message || String(e))
-    + '
-' + (e.filename || '(no file)') + ' line ' + (e.lineno || '?');
-  document.body.insertBefore(pre, document.body.firstChild);
-}, true);
-</script>
 <script type="module" src="js/main.js"></script>
 </body>
 </html>

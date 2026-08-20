@@ -68,12 +68,23 @@ function run() {
   const list = ladder(PIPE[nps].sch);
   const pick = stopped ? null : selectSchedule(PIPE[nps].sch, need);
 
-  $('need').textContent = need.toFixed(3) + '"';
-  $('need').className = 'v' + (stopped || !pick ? ' stop' : '');
+  /* Bars scale against the heavier of the thickest permitted schedule and the
+     requirement, so the requirement line is always on scale. */
+  const scale = Math.max(...list.map(([, wall]) => wall), need);
+  const pos = need / scale * 100;
+
+  $('need').textContent = need.toFixed(3) + '" required';
+  $('need').style.left = pos + '%';
+  $('need').className = 'lab' + (pos < 18 ? ' l' : pos > 82 ? ' r' : '')
+    + (stopped || !pick ? ' stop' : '');
 
   $('rows').innerHTML = list.map(([name, wall]) => {
-    const cls = wall < need ? 'short' : (pick && name === pick.name ? 'win' : '');
-    return `<tr class="${cls}"><td>Sch ${name}</td><td>${wall.toFixed(3)}"</td></tr>`;
+    const cls = stopped || wall < need ? 'short'
+      : (pick && name === pick.name ? 'win' : '');
+    return `<div class="srow ${cls}" role="row"><span class="n" role="cell">Sch ${name}</span>`
+      + `<span class="track" role="cell"><span class="fill" style="width:${wall / scale * 100}%"></span>`
+      + `<span class="req" style="left:${pos}%"></span></span>`
+      + `<span class="v" role="cell">${wall.toFixed(3)}"</span></div>`;
   }).join('');
 
   const n = $('note');
