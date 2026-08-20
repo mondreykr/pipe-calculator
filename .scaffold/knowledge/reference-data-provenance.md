@@ -60,8 +60,6 @@ Adam decided on 2026-08-20 that both temperature limits print a note and leave t
 
 ## Material list - pipe versus components
 
-Line list 268782 shows only **A333 Gr 6** as a pipe material. **A106 Gr B** remains an assumption about what EnerCorp specifies for pipe, though its stress values are now confirmed.
-
 **A420 WPL6, A234 WPB, A350 LF2 Cl 1 and A105 are fitting and forging materials, not pipe.** They were requested deliberately: a butt-weld fitting's wall is matched to the connecting pipe schedule, so running the same wall check on the fitting material is a real question. But the tool's output still reads as a pipe schedule, and it has no way to know the user selected a forging. Adam accepted this.
 
 ## Pipe dimensions (`PIPE`) - verified 2026-08-20

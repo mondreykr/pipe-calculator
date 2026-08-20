@@ -64,9 +64,11 @@ selection  = lightest permitted schedule whose wall ≥ minimum
 
 **The schedule ladder is sorted by wall thickness, never by schedule name or object insertion order.** This is not cosmetic. From NPS 8 upward XXS is thinner than Sch 160; from NPS 18 upward XS is thinner than Sch 40. A name-ordered list selects heavier pipe than required. The numeric sort in `ladder()` (`js/calc.js`) is load-bearing.
 
-**Stop conditions suppress the selection entirely rather than degrading it.** Two of them: `t ≥ D/6` (the thin-wall formula no longer applies) and no permitted schedule satisfying the minimum. Each produces a plain refusal and no number.
+**Stop conditions suppress the selection entirely rather than degrading it.** Two of them: `t ≥ D/6` (the thin-wall formula no longer applies) and no permitted schedule satisfying the minimum. Neither highlights a schedule, and every row dims so that nothing reads as passing. The requirement itself still renders, in the refusal colour, above a plain refusal note.
 
 **Temperature limits warn; they do not suppress.** Unlike the stop conditions above, both limits print a note and leave the ladder rendered with a schedule highlighted - Adam's decision 2026-08-20, on the grounds that a note is sufficient for a screening tool. Above `max` the interpolation clamps, so the answer stops responding to temperature. Below a numeric `min` the tool warns. Where Table A-1C prints a Note (6) letter code instead of a minimum, there is no number to compare and the tool says so rather than implying a pass; that applies to A106 Gr B and A234 WPB.
+
+**The result reads as a scale, not a table.** Each permitted schedule draws a bar proportional to its wall, scaled against the heavier of the thickest permitted schedule and the requirement, so the requirement line is always on scale. The minimum wall required is not a separate row: it labels that line at the position it occupies on the scale, so the number and the line are one object. The lightest passing schedule is marked by a bar in the panel gutter rather than by row geometry, which keeps every row identical in padding and border. The panel bleeds 14 px up and out so its content box aligns with the input column and the RESULT heading sits on the INPUTS line. The label colour (`--req`) is chosen for 4.5:1 contrast against the panel because it is the tool's primary output; lightening it fails accessibility on the one number that matters. All of this lives in `js/main.js` - `js/calc.js` stays free of the DOM, so none of it is covered by tests.
 
 **`Y` is fixed at 0.4**, valid for ferritic materials below 900 °F. Every material's `max` is set to 900 for this reason rather than to its own tabulated ceiling, but the coupling is implicit rather than enforced in code - a new material or a raised ceiling has to be checked against it by hand.
 
@@ -77,8 +79,8 @@ selection  = lightest permitted schedule whose wall ≥ minimum
 ## Run / env
 `python -m http.server 8000`, then `http://localhost:8000/`. Python 3.14 is on this machine; any static server does.
 
-**Opening `index.html` from disk does not work.** Browsers block ES6 module loading over `file://`, and the failure is a blank page with a console error rather than anything visible. This is the cost of the module split and it was accepted knowingly - the delivery model is a bookmarked URL, not a file anyone opens locally.
+**Opening `index.html` from disk does not work.** Browsers block ES6 module loading over `file://`, and the failure is a blank page with a console error rather than anything visible. This is the cost of the module split and it was accepted knowingly - the delivery model is a bookmarked URL, not a file anyone opens locally. A stale browser cache produces the identical symptom, so force-refresh before diagnosing anything.
 
 It loads with defaults applied and results already computed: NPS 8, 660 psig, 500 °F, A333 Gr 6, 1/4" corrosion allowance, E = 1.00, 12.5% mill tolerance. Every input recomputes on `input`.
 
-Tests: `npm test` (or `node test/run-tests.js`). Node only, nothing to install. 17 checks over `js/calc.js` and the data files. Nothing covers `js/main.js` - the form is verified by serving the page and looking at it.
+Tests: `npm test` (or `node test/run-tests.js`). Node only, nothing to install. 23 checks over `js/calc.js` and the data files. Nothing covers `js/main.js` - the form is verified by serving the page and looking at it.

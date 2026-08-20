@@ -70,8 +70,6 @@ The **pipe dimension table** in `js/data/pipe.js` is confirmed against two indep
 
 Method and evidence for both are recorded in `.scaffold/knowledge/reference-data-provenance.md`.
 
-Release also needs recorded engineering sign-off and the repository moved to the `enercorp` org. See `.scaffold/milestones/01-release-readiness/milestone.md`.
-
 ## Project documentation
 
 Durable project knowledge lives in `.scaffold/` - what the tool is and is not (`project.md`), how it is built (`architecture.md`), where the work stands (`state.md`), and the verification evidence (`knowledge/`). `CLAUDE.md` carries the rules for working in this repository.
