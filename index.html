@@ -43,11 +43,31 @@
       <div role="table">
         <div class="shead" role="row">
           <span role="columnheader">Schedule</span>
-          <span class="anch" role="columnheader"><span class="lab" id="need"></span></span>
-          <span role="columnheader">Wall</span>
+          <span class="anch" role="columnheader"><span class="lab" id="need">Required</span></span>
+          <span role="columnheader">Nominal wall</span>
         </div>
         <div id="rows" role="rowgroup"></div>
       </div>
+
+      <div class="chk" id="chk" role="table">
+        <div class="chkh" role="row">
+          <span role="columnheader">Wall thickness check</span>
+          <span class="sch" id="chkSch" role="columnheader"></span>
+        </div>
+        <div class="crow" role="row">
+          <span class="k" role="cell">AVAILABLE (LMC)</span>
+          <span class="v" id="chkAvail" role="cell"></span>
+        </div>
+        <div class="crow" role="row">
+          <span class="k" role="cell">REQUIRED (t)</span>
+          <span class="v" id="chkReq" role="cell"></span>
+        </div>
+        <div class="crow ex" role="row">
+          <span class="k" role="cell">EXCESS</span>
+          <span class="v" id="chkEx" role="cell"></span>
+        </div>
+      </div>
+
       <p class="note" id="note"></p>
     </div>
 
@@ -57,8 +77,11 @@
 <footer>
   <dl>
     <dt>Basis</dt>
-    <dd><span class="eq">t = PD / 2(SE + PY)</span>, ASME B31.3 para. 304.1.2.
-        Minimum wall = (t + corrosion allowance) &divide; (1 &minus; mill tolerance).</dd>
+    <dd class="lines">
+      <span class="eq">Available wall (LMC) = (nominal wall &times; (1 &minus; mill tolerance)) &minus; corrosion allowance</span>
+      <span><span class="eq">Required wall (t) = PD / 2(SE + PY)</span> (per ASME B31.3 para. 304.1.2)</span>
+      <span>A schedule passes when available wall (in Least Material Condition) is &ge; t.</span>
+      </dd>
 
     <dt>Assumptions</dt>
     <dd>Y = 0.4, ferritic materials below 900&nbsp;&deg;F. Thread and groove depth taken as zero
@@ -68,14 +91,6 @@
     <dd>Branch reinforcement, external pressure, thermal expansion and support loading, fatigue,
         Category M and severe cyclic service. Flange, fitting and MDMT requirements are assessed
         separately.</dd>
-
-    <dt>Schedules</dt>
-    <dd>EnerCorp permitted set. Sizes 1-1/4, 2-1/2, 3-1/2, 5 and 22 are not used.</dd>
-
-    <dt>Status</dt>
-    <dd>Allowable stress values are transcribed from ASME B31.3 Table A-1C. Pipe dimensions are
-        checked against an ANSI B36.10 chart and the EnerCorp component criteria workbook. This tool
-        screens only; the line list remains the calculation of record.</dd>
   </dl>
 </footer>
 

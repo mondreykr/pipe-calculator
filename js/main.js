@@ -3,7 +3,7 @@ import { PIPE } from './data/pipe.js';
 import { MATS } from './data/materials.js';
 import {
   interpolateStress, overTemperature, underTemperature, noteGovernedMinimum,
-  pressureThickness, minimumWall, ladder, selectSchedule, tooThick
+  pressureThickness, minimumWall, checkStrings, ladder, selectSchedule, tooThick
 } from './calc.js';
 
 /* Input options. Not reference data - these are the choices the form offers. */
@@ -73,7 +73,7 @@ function run() {
   const scale = Math.max(...list.map(([, wall]) => wall), need);
   const pos = need / scale * 100;
 
-  $('need').textContent = need.toFixed(3) + '" required';
+  /* The label is static markup - see .anch in styles.css for why it carries no number. */
   $('need').style.left = pos + '%';
   $('need').className = 'lab' + (pos < 18 ? ' l' : pos > 82 ? ' r' : '')
     + (stopped || !pick ? ' stop' : '');
@@ -87,6 +87,30 @@ function run() {
       + `<span class="v" role="cell">${wall.toFixed(3)}"</span></div>`;
   }).join('');
 
+  /* The check block restates the answer in least material condition. Which schedule it
+     reports on:
+       passing size    - the selected schedule.
+       nothing passes  - the heaviest permitted, so the reader learns by how much the
+                         size fails. Excess goes negative; the sign and the colour are
+                         what say so, which is why no sentence is needed here.
+       above D/6       - suppressed entirely. The formula has stopped applying, so t is
+                         not a number worth printing at four decimal places. */
+  const heaviest = list[list.length - 1];
+  const subject = pick || (stopped ? null : { name: heaviest[0], wall: heaviest[1] });
+  $('chk').hidden = !subject;
+  if (subject) {
+    /* Every number, and the rounding rules behind them, come from calc.js. */
+    const c = checkStrings({ wall: subject.wall, ca, millTol: tol, t });
+    $('chk').className = 'chk' + (pick ? '' : ' fail');
+    $('chkSch').textContent = 'Sch ' + subject.name;
+    $('chkAvail').textContent = c.available;
+    $('chkReq').textContent = c.required;
+    $('chkEx').textContent = c.excess;
+  }
+
+  /* The note carries stop conditions ONLY. An empty one collapses - see .note:empty.
+     The informational sentence that used to live here was removed: what it explained
+     is now stated by the check block and the footer Basis. */
   const n = $('note');
   if (stopped) {
     n.className = 'note stop';
@@ -96,7 +120,7 @@ function run() {
     n.textContent = 'No permitted schedule is thick enough.';
   } else {
     n.className = 'note';
-    n.textContent = 'Minimum wall includes the corrosion allowance and the mill tolerance. Highlighted row is the lightest permitted schedule that passes.';
+    n.textContent = '';
   }
 }
 
