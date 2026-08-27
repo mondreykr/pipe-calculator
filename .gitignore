@@ -15,3 +15,6 @@ nul
 
 # Working scratch, not published - GitHub Pages serves this repo root as-is
 references/
+
+# playwright-cli run artifacts (screenshots, snapshots, console logs)
+.playwright-cli/

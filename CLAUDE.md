@@ -17,6 +17,8 @@ Durable project knowledge lives in `.scaffold/`. Orient with `/scaffold-status` 
   - `python -m http.server 8000`, then open `http://localhost:8000/`.
   - **Opening `index.html` from disk does not work.** ES6 modules are blocked over `file://`, so a double-click gives a blank page with a console error, not a visible failure. Always serve it.
   - Loads with defaults applied (NPS 8, 660 psig, 500 °F, A333 Gr 6, 1/4" CA, E = 1.00, 12.5% mill tolerance) and results already computed.
+  - **Look at the page with `playwright-cli`** (global CLI, no project dependency). Serve on 8000, then `playwright-cli open http://localhost:8000/`.
+  - **Artifacts land in `.playwright-cli/` and stay gitignored.** GitHub Pages serves this repo root as-is, so an un-ignored screenshot folder publishes.
 
 - **Deploy - check**
   - `gh api repos/:owner/:repo/pages` reports the source branch, path and build status. Reports; changes nothing.
@@ -31,7 +33,7 @@ Durable project knowledge lives in `.scaffold/`. Orient with `/scaffold-status` 
 ## Tests
 
 - **`npm test`** - AUTOMATIC, before commit
-  - `npm test`, or `node test/run-tests.js`. Node only, no dependencies to install, no framework. 23 checks.
+  - `npm test`, or `node test/run-tests.js`. Node only, no dependencies to install, no framework. 34 checks.
   - **An edit is not finished until this passes and the page still loads clean in a browser.** The suite exercises `js/calc.js` and the data files; it never touches `js/main.js`, so a broken form is invisible to it - serve the page and look.
   - Green means the arithmetic and the selection logic still behave. Green does **not** mean the answers are right - a passing suite over provisional stress values still produces wrong walls.
   - **Never make a red run green by editing an expected value.** The line list cases were verified by hand against a real line list; the code is what moves.
@@ -46,16 +48,21 @@ Durable project knowledge lives in `.scaffold/`. Orient with `/scaffold-status` 
   - Compare changed values against a licensed ASME B31.3 2024 Table A-1 (stress) or a controlled pipe chart / ASME B36.10M (walls) - evidence this repo did not author. This is the only kind of check that can catch a wrong number; the regression suite only confirms what the file already claims about itself. Every unexplained difference gets an explanation. "Close enough" is not an outcome.
   - Adam supplies the licensed source. Do not go find one.
 
-## Reviews (always gated on Adam)
-**Never run one unasked.** Name what you'd run and why. Offer at two junctures: **the change is risky**, or **Adam is about to commit.**
+## Reviews and Disciplines
+*Every row runs on Claude's judgement.* 
+
+- **DISCIPLINE**: runs before or during the work.
+- **REVIEW**: runs on finished work.
 
 | Review | Reach for it when |
 |--------|-------------------|
-| `/code-review` (medium) | Correctness bugs. The default escalation |
-| `/verify` | Behaviour matters more than the diff - open the page and drive the real inputs |
-| `/simplify` | Works but messy. Applies changes - commit first |
+| `/systematic-debugging` | **DISCIPLINE** | Any bug or unexpected behaviour, BEFORE a fix is named |
+| `/test-integrity>` | **DISCIPLINE** | Writing or changing a test, or judging what a green suite is worth |
+| `/code-review` | Correctness bugs. Default to medium effort. Use high effort for riskier logic. Name the cost first. |
+| `/adversarial-review` | A risky approach before it's built, or built work needing independent challenge. Multi-model fan-out. Name the cost first. |
+| `/verify` | Behaviour matters. Open the page and drive the real inputs. Name the cost first. |
+| `/simplify` | Works but messy. Applies changes, so commit first. |
 | `/security-review` | Rarely applicable - no network calls, no credentials, no input beyond numbers |
-| `/adversarial-review` | Any change to `PIPE`, `MATS`, `interp`, the ladder sort, or the stop conditions. These are the paths where a plausible-looking edit silently produces an unsafe wall thickness |
 
 ## Code Conventions
 *How code in this repo gets written: language, structure, naming, comments. Nothing about what the tool does.*
