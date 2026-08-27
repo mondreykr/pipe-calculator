@@ -33,7 +33,10 @@ h2{font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
   margin:-14px -14px 0;padding:14px 14px 16px}
 .panel h2{border-bottom-color:var(--tan)}
 
-.shead{display:grid;grid-template-columns:70px 1fr 96px;gap:11px;align-items:end;
+/* 56px for the wall column, deliberately narrow: the bar is the thing that reads at a
+   glance, so it gets the width. Spelling the heading "Nominal wall" needed 90px and cut
+   the bar short, which is why it says WALL - Adam's call 2026-08-26. */
+.shead{display:grid;grid-template-columns:70px 1fr 56px;gap:11px;align-items:end;
   height:30px;padding-bottom:7px;border-bottom:1px solid #e3ded4;
   font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#96958f;font-weight:600}
 .shead span:last-child{text-align:right;white-space:nowrap}
@@ -52,7 +55,7 @@ h2{font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
 
 /* Every row carries identical padding and border. The lightest passing schedule is
    marked by a bar in the panel gutter, which costs the row no geometry. */
-.srow{display:grid;grid-template-columns:70px 1fr 96px;gap:11px;align-items:center;
+.srow{display:grid;grid-template-columns:70px 1fr 56px;gap:11px;align-items:center;
   height:37px;border-bottom:1px solid #efece4;font-size:13.5px}
 .srow .v{text-align:right;font-weight:500}
 .srow.short{color:#b9b7b1}
@@ -82,6 +85,8 @@ h2{font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
 
 /* Row labels are literal capitals with NO text-transform. The lowercase t in "(t)"
    is the ASME symbol; uppercasing the row turned it into "(T)", a different thing. */
+/* 96px, wider than the ladder's 56px, because "−<0.0001"" does not fit in 56. Both
+   columns are right-aligned to the same panel edge, so the numbers still line up. */
 .crow{display:grid;grid-template-columns:1fr 96px;gap:11px;align-items:center;
   height:29px;border-bottom:1px solid #efece4;font-size:13.5px}
 .crow .k{font-size:11px;letter-spacing:.04em;color:#7d7d78;font-weight:500}
