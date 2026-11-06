@@ -155,7 +155,7 @@ check('the three printed numbers always reconcile', () => {
   const c = checkStrings({ wall: 0.133, ca: 0, millTol: 0.125, t });
   assert.equal(c.available, '0.1164"');
   assert.equal(c.required, '0.0039"');
-  assert.equal(c.excess, '+0.1125"', 'must equal the visible subtraction, not +0.1124');
+  assert.equal(c.excess, '0.1125"', 'must equal the visible subtraction, not 0.1124');
 
   /* And as a property, everywhere the form can reach. */
   let compared = 0;
@@ -195,11 +195,11 @@ check('a margin below the displayed resolution never prints as zero', () => {
      exactly) so the test exercises the sub-resolution branch and not a boundary. */
   const w = { wall: 0.500, ca: 0.250, millTol: 0.125 };
   const avail = availableWall(w);                        // 0.1875 exactly
-  assert.equal(checkStrings({ ...w, t: avail - 2e-6 }).excess, '+<0.0001"', 'a hair spare');
+  assert.equal(checkStrings({ ...w, t: avail - 2e-6 }).excess, '<0.0001"', 'a hair spare');
   assert.equal(checkStrings({ ...w, t: avail + 2e-6 }).excess, '−<0.0001"', 'a hair short');
 
   /* An exact tie passes with a genuine zero, and never carries a minus. */
-  assert.equal(checkStrings({ ...w, t: avail }).excess, '+0.0000"');
+  assert.equal(checkStrings({ ...w, t: avail }).excess, '0.0000"');
 
   /* Both sides still print the same available and required, which is the point: the
      numbers alone cannot distinguish these three, so the excess field has to. */

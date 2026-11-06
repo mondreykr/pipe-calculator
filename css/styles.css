@@ -34,23 +34,29 @@ h2{font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
 .panel h2{border-bottom-color:var(--tan)}
 
 /* 56px for the wall column, deliberately narrow: the bar is the thing that reads at a
-   glance, so it gets the width. Spelling the heading "Nominal wall" needed 90px and cut
-   the bar short, which is why it says WALL - Adam's call 2026-08-26. */
+   glance, so it gets the width. The headings are two lines (NOMINAL / WALL) so they fit it.
+   --hd is one heading line, 16.5px, the same height as an input label. The second heading
+   line sits on the same row as the first input's label, so the inputs column is pushed
+   down by --hd (see the first-column h2 rule below). */
+:root{--hd:16.5px}
 .shead{display:grid;grid-template-columns:70px 1fr 56px;gap:11px;align-items:end;
-  height:30px;padding-bottom:7px;border-bottom:1px solid #e3ded4;
-  font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#96958f;font-weight:600}
-.shead span:last-child{text-align:right;white-space:nowrap}
+  height:calc(var(--hd) * 2 + 7px);padding-bottom:7px;border-bottom:1px solid #e3ded4;
+  font-size:10px;line-height:var(--hd);letter-spacing:.09em;text-transform:uppercase;
+  color:#96958f;font-weight:600}
+.shead > span:last-child{text-align:right;white-space:nowrap}
+.cols > div:first-child h2{margin-bottom:calc(14px + var(--hd))}
 
-/* The tick label is anchored to the position the requirement occupies on the bar
-   scale, so the label and the line it draws are one object. It carries NO number:
+/* The tick label is anchored to the position the minimum nominal wall occupies on the bar
+   scale, so the label and the line it draws are one object. It carries NO number here:
    the minimum nominal wall is a synthetic quantity (no pipe is 0.528" thick), and
    printing it beside a column of nominal walls invited reading it against them -
-   0.3995 required next to Sch 160 at 0.438 reads as a pass and is not one. */
+   0.3995 required next to Sch 160 at 0.438 reads as a pass and is not one. The number
+   appears only inside "Show the working", as a step in the derivation. */
 .anch{position:relative}
-.anch .lab{position:absolute;bottom:1px;transform:translateX(-50%);white-space:nowrap;
+.anch .lab{position:absolute;bottom:0;transform:translateX(-50%);white-space:nowrap;text-align:center;
   font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--req);font-weight:600}
-.anch .lab.l{transform:none}
-.anch .lab.r{transform:translateX(-100%)}
+.anch .lab.l{transform:none;text-align:left}
+.anch .lab.r{transform:translateX(-100%);text-align:right}
 .anch .lab.stop{color:var(--no)}
 
 /* Every row carries identical padding and border. The lightest passing schedule is
@@ -92,8 +98,22 @@ h2{font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
 .crow .k{font-size:11px;letter-spacing:.04em;color:#7d7d78;font-weight:500}
 .crow .v{text-align:right;font-weight:500}
 .crow.ex{border-bottom:none}
-.crow.ex .k,.crow.ex .v{color:var(--green);font-weight:600}
 .chk.fail .crow.ex .k,.chk.fail .crow.ex .v{color:var(--no)}
+
+sub{line-height:0}
+
+/* The working: every step of the calculation with this page's numbers in it. Collapsed by
+   default; the check block above already carries the answer. */
+.det{margin-top:14px;font-size:11.5px;color:#8a8a86}
+.det summary,footer summary{cursor:pointer;font-size:11px;letter-spacing:.04em;color:#7d7d78;font-weight:500}
+footer details[open] summary{margin-bottom:10px}
+.det .step{padding:8px 0;border-bottom:1px solid #efece4}
+.det .step:last-child{border-bottom:none}
+.det .row{display:grid;grid-template-columns:1fr auto;gap:11px;align-items:baseline}
+.det .k{font-size:11px;letter-spacing:.04em;color:#7d7d78;font-weight:500}
+.det .v{font-size:13.5px;color:var(--ink);font-weight:500}
+.det .sum{color:var(--green);font-weight:600;font-size:11px;letter-spacing:.04em;padding-top:8px}
+.det .calc{font-weight:300;line-height:1.5;margin-top:2px}
 
 .note:empty{display:none}
 .note{font-size:11.5px;color:#8a8a86;margin-top:14px;line-height:1.6;font-weight:300}
@@ -107,9 +127,13 @@ footer dt{font-weight:600;color:#6f6f6a;letter-spacing:.05em;text-transform:uppe
 footer dd{margin:0}
 footer dd.lines{display:flex;flex-direction:column;gap:3px}
 footer .eq{font-variant-numeric:tabular-nums;color:#6f6f6a}
+footer .sym{border-collapse:collapse}
+footer .sym td{padding:1px 14px 1px 0;vertical-align:top}
+footer .sym td:first-child{color:#6f6f6a;white-space:nowrap}
 
 @media(max-width:640px){
   .cols{grid-template-columns:1fr;gap:26px}
+  .cols > div:first-child h2{margin-bottom:14px}
   .page{padding:20px 16px}
   .panel{margin-left:0;margin-right:0}
   footer dl{grid-template-columns:1fr;gap:2px 0}

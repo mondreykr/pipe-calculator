@@ -3,7 +3,7 @@ import { PIPE } from './data/pipe.js';
 import { MATS } from './data/materials.js';
 import {
   interpolateStress, overTemperature, underTemperature, noteGovernedMinimum,
-  pressureThickness, minimumWall, checkStrings, ladder, selectSchedule, tooThick
+  pressureThickness, minimumWall, checkStrings, ladder, selectSchedule, tooThick, roundTo, Y
 } from './calc.js';
 
 /* Input options. Not reference data - these are the choices the form offers. */
@@ -98,6 +98,7 @@ function run() {
   const heaviest = list[list.length - 1];
   const subject = pick || (stopped ? null : { name: heaviest[0], wall: heaviest[1] });
   $('chk').hidden = !subject;
+  $('det').hidden = !subject;
   if (subject) {
     /* Every number, and the rounding rules behind them, come from calc.js. */
     const c = checkStrings({ wall: subject.wall, ca, millTol: tol, t });
@@ -106,6 +107,26 @@ function run() {
     $('chkAvail').textContent = c.available;
     $('chkReq').textContent = c.required;
     $('chkEx').textContent = c.excess;
+
+    /* The working: each step with this page's numbers substituted, in the order you would
+       do it by hand. Intermediate values are shown to 4 places but carried unrounded, so a
+       hand check can differ from a printed step in the last digit. */
+    const f4 = x => roundTo(x, 4).toFixed(4) + '"';
+    const m = +tol.toFixed(4);
+    const sub = (k, expr, v) => `<div class="step"><div class="row"><span class="k">${k}</span>`
+      + `<span class="v">${v}</span></div><div class="calc">${expr}</div></div>`;
+    $('detBody').innerHTML =
+      sub('PRESSURE WALL (t)',
+        `${P} &times; ${D} / (2 &times; (${Math.round(S)} &times; ${E} + ${Y} &times; ${P}))`, f4(t))
+      + sub('WALL WITH ALLOWANCES (t<sub>m</sub>)', `t + CA = ${f4(t)} + ${ca}"`, f4(t + ca))
+      + sub('MIN NOMINAL WALL (t<sub>NOM,min</sub>)',
+        `t<sub>m</sub> / (1 &minus; MT) = ${f4(t + ca)} / (1 &minus; ${m})`, f4(need))
+      + `<div class="sum">Sch ${subject.name}</div>`
+      + sub('NOMINAL WALL (t<sub>NOM</sub>)', 'from the schedule table', subject.wall.toFixed(3) + '"')
+      + sub('AVAILABLE WALL (t<sub>LMC</sub>)',
+        `t<sub>NOM</sub> &times; (1 &minus; MT) &minus; CA = ${subject.wall.toFixed(3)} &times; (1 &minus; ${m}) &minus; ${ca}"`,
+        c.available)
+      + sub('EXCESS', `t<sub>LMC</sub> &minus; t = ${c.available} &minus; ${c.required}`, c.excess);
   }
 
   /* The note carries stop conditions ONLY. An empty one collapses - see .note:empty.
@@ -114,7 +135,7 @@ function run() {
   const n = $('note');
   if (stopped) {
     n.className = 'note stop';
-    n.textContent = 'Required wall reaches D/6, where this formula no longer applies.';
+    n.textContent = 'Pressure wall (t) reaches D/6, where this formula no longer applies.';
   } else if (!pick) {
     n.className = 'note stop';
     n.textContent = 'No permitted schedule is thick enough.';

@@ -42,9 +42,9 @@
       <h2>Result</h2>
       <div role="table">
         <div class="shead" role="row">
-          <span role="columnheader">Schedule</span>
-          <span class="anch" role="columnheader"><span class="lab" id="need">Required</span></span>
-          <span role="columnheader">Wall</span>
+          <span role="columnheader">Pipe<br>schedule</span>
+          <span class="anch" role="columnheader"><span class="lab" id="need">Min nom.<br>wall</span></span>
+          <span role="columnheader">Nominal<br>wall</span>
         </div>
         <div id="rows" role="rowgroup"></div>
       </div>
@@ -55,11 +55,11 @@
           <span class="sch" id="chkSch" role="columnheader"></span>
         </div>
         <div class="crow" role="row">
-          <span class="k" role="cell">AVAILABLE (LMC)</span>
+          <span class="k" role="cell">AVAILABLE WALL (t<sub>LMC</sub>)</span>
           <span class="v" id="chkAvail" role="cell"></span>
         </div>
         <div class="crow" role="row">
-          <span class="k" role="cell">REQUIRED (t)</span>
+          <span class="k" role="cell">PRESSURE WALL (t)</span>
           <span class="v" id="chkReq" role="cell"></span>
         </div>
         <div class="crow ex" role="row">
@@ -68,6 +68,11 @@
         </div>
       </div>
 
+      <details class="det" id="det" hidden>
+        <summary>Show Details</summary>
+        <div id="detBody"></div>
+      </details>
+
       <p class="note" id="note"></p>
     </div>
 
@@ -75,23 +80,49 @@
 </div>
 
 <footer>
+  <details>
+  <summary>Footnotes</summary>
   <dl>
     <dt>Basis</dt>
     <dd class="lines">
-      <span class="eq">Available wall (LMC) = (nominal wall &times; (1 &minus; mill tolerance)) &minus; corrosion allowance</span>
-      <span><span class="eq">Required wall (t) = PD / 2(SE + PY)</span> (per ASME B31.3 para. 304.1.2)</span>
-      <span>A schedule passes when available wall (in Least Material Condition) is &ge; t.</span>
-      </dd>
+      <span><span class="eq">t = PD / (2(SE + PY))</span> (ASME B31.3 para. 304.1.2, eq. 3a)</span>
+      <span><span class="eq">t<sub>m</sub> = t + CA</span> (eq. 2)</span>
+      <span><span class="eq">t<sub>LMC</sub> = t<sub>NOM</sub> &times; (1 &minus; MT) &minus; CA</span></span>
+      <span><span class="eq">t<sub>NOM,min</sub> = t<sub>m</sub> / (1 &minus; MT)</span></span>
+      <span>A schedule passes when <span class="eq">t<sub>LMC</sub> &ge; t</span>, which is the same test as
+        <span class="eq">t<sub>NOM</sub> &ge; t<sub>NOM,min</sub></span>. <span class="eq">EXCESS = t<sub>LMC</sub> &minus; t</span>.</span>
+    </dd>
+
+    <dt>Symbols</dt>
+    <dd>
+      <table class="sym">
+        <tr><td>P</td><td>Design pressure, psig.</td></tr>
+        <tr><td>D</td><td>Outside diameter of the pipe, in. Set by the pipe size.</td></tr>
+        <tr><td>S</td><td>Allowable stress at the design temperature, psi (B31.3 Table A-1).</td></tr>
+        <tr><td>E</td><td>Joint efficiency: the longitudinal weld quality factor.</td></tr>
+        <tr><td>Y</td><td>Coefficient, 0.4 for ferritic steel below 900&nbsp;&deg;F.</td></tr>
+        <tr><td>t</td><td>Pressure wall: the thinnest wall that contains the pressure, with no allowances.</td></tr>
+        <tr><td>CA</td><td>Corrosion allowance: wall reserved to be lost to corrosion.</td></tr>
+        <tr><td>MT</td><td>Mill tolerance: the fraction of nominal wall the mill may ship under.</td></tr>
+        <tr><td>t<sub>m</sub></td><td>Wall with allowances, t + CA. B31.3 calls it the minimum required thickness.</td></tr>
+        <tr><td>t<sub>NOM</sub></td><td>Nominal wall: the schedule&rsquo;s listed wall, shown in the Nominal wall column.</td></tr>
+        <tr><td>t<sub>LMC</sub></td><td>Available wall in least material condition (LMC): the wall guaranteed in the worst legal case, with the full mill under-run taken and the corrosion allowance used up.</td></tr>
+        <tr><td>t<sub>NOM,min</sub></td><td>Minimum nominal wall: the thinnest nominal wall that passes. It is the tick on the bars.</td></tr>
+      </table>
+    </dd>
 
     <dt>Assumptions</dt>
     <dd>Y = 0.4, ferritic materials below 900&nbsp;&deg;F. Thread and groove depth taken as zero
-        for welded and flanged construction.</dd>
+        for welded and flanged construction. The weld joint strength reduction factor W is 1 for
+        carbon steel at every temperature this tool allows (B31.3 Table 302.3.5-1), so it does not
+        appear in the formula.</dd>
 
     <dt>Excludes</dt>
     <dd>Branch reinforcement, external pressure, thermal expansion and support loading, fatigue,
         Category M and severe cyclic service. Flange, fitting and MDMT requirements are assessed
         separately.</dd>
   </dl>
+  </details>
 </footer>
 
 <script type="module" src="js/main.js"></script>

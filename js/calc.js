@@ -117,13 +117,14 @@ export function checkStrings({ wall, ca, millTol, t, q = Q }) {
 
   let excess;
   if (rExcess !== 0) {
-    excess = (rExcess < 0 ? '−' : '+') + Math.abs(rExcess).toFixed(4) + '"';
+    excess = (rExcess < 0 ? '−' : '') + Math.abs(rExcess).toFixed(4) + '"';
   } else if (Math.abs(raw) < 1e-9) {
     /* An exact tie. Its raw sign is floating-point noise, and a tie passes. */
-    excess = '+0.0000"';
+    excess = '0.0000"';
   } else {
-    /* Real, non-zero, below the displayed resolution. Print the bound, never 0.0000. */
-    excess = (raw < 0 ? '−' : '+') + '<0.0001"';
+    /* Real, non-zero, below the displayed resolution. Print the bound, never 0.0000.
+       Only a shortfall carries a sign: a minus means the schedule fails. */
+    excess = (raw < 0 ? '−' : '') + '<0.0001"';
   }
   return { available: rAvail.toFixed(4) + '"', required: rReq.toFixed(4) + '"', excess };
 }
